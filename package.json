@@ -1,0 +1,46 @@
+{
+  "author": "Aman Siddiqui <aman.siddiqui114@gmail.com>",
+  "bin": {
+    "teachify": "dist/server.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.12.0",
+    "zod": "^3.23.8"
+  },
+  "description": "Teachify \u2014 MCP connector that turns any LLM into a teacher, not a doer. Learn by doing, step by step, with verification and quizzes.",
+  "devDependencies": {
+    "@types/node": "^20.12.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "learning",
+    "teach",
+    "llm",
+    "education",
+    "claude-code",
+    "cursor"
+  ],
+  "license": "MIT",
+  "main": "dist/server.js",
+  "name": "teachify",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/iamamansid/teachify.git"
+  },
+  "scripts": {
+    "build": "NODE_OPTIONS=--max-old-space-size=4096 tsc && node scripts/copy-tasks.js",
+    "dev": "tsx src/server.ts",
+    "inspect": "npx @modelcontextprotocol/inspector node dist/server.js",
+    "lint": "tsc --noEmit",
+    "start": "node dist/server.js",
+    "test": "npm run build && node --test dist/engine/tasks.test.js dist/engine/verifier.test.js dist/engine/session-hints.test.js"
+  },
+  "type": "commonjs",
+  "version": "0.1.0"
+}
