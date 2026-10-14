@@ -11,9 +11,14 @@ export function createSession(taskId: string, mode: TeachMode = "teach"): Sessio
       `Unknown taskId "${taskId}". Available: ${listKnownTaskIds().join(", ")}`
     );
   }
+  return createSessionForTask(task, mode);
+}
+
+/** Create a session for an already-resolved task (JSON or dynamic). */
+export function createSessionForTask(task: TeachTask, mode: TeachMode = "teach"): Session {
   const session: Session = {
     id: randomUUID(),
-    taskId,
+    taskId: task.id,
     mode,
     startedAt: Date.now(),
     currentStepIndex: 0,

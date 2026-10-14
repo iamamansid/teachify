@@ -1,5 +1,31 @@
 # Architecture — Teachify v0.1
 
+## Teach Mode flow (any prompt) — the product
+
+```
+User prompt (same as for an agent)     LLM plans                Teachify enforces
+"Implement JWT auth"          →  teach_mode_on (loads prompt)
+                                →  teach_plan { prompt, steps, quiz }
+                                     │  validate: 3-7 steps, hints, checks, quiz
+                                     ▼
+                               ┌──────────────────┐
+                               │  Dynamic task    │  teach-<id> registered in-memory
+                               │  + session       │  step 1 only returned
+                               └──────────────────┘
+                                     │
+                                     ▼  guide loop (same as demo tasks)
+                               teach_next_step → learner types → teach_check_step
+                                     │  fail → teach_hint L1→L3
+                                     ▼  pass → next step (title-only preview)
+                               teach_quiz → teach_progress
+```
+
+**Why planning lives in the LLM:** it has the user's context — stack, files, existing code, error messages. A static planner cannot see those.
+
+**Why enforcement lives in Teachify:** the LLM proposes, Teachify validates and enforces. Validation rejects bad plans (too few/many steps, missing hints, bad checks) before a session exists. Verification advances only on pass. Step-1-only + title-only previews make it structurally hard for the LLM to dump a full solution, even if it tries.
+
+Dynamic tasks use the **same invariants** as pre-authored tasks (see Session flow below): never the full solution, advance only on pass, hints never type code, quiz answers LLM-only.
+
 ## Why MCP-first
 
 Teachify is an **MCP server over stdio**, not a VS Code-only extension and not a desktop overlay.
@@ -113,7 +139,6 @@ Regex tips: use `flags: "ms"` when the pattern spans lines. Keep patterns forgiv
 
 ## What is deliberately NOT in v0.1
 
-- **No LLM planner.** Steps are authored JSON, not LLM-generated. This keeps verification reliable. v0.2 adds a planner that proposes steps for free-form "teach me X" — still verified, still never auto-typing.
-- **No persistence.** Sessions live in an in-memory `Map`. Restarting the server clears sessions. v0.2 adds JSON-file persistence.
+- **No persistence.** Sessions (including dynamic Teach Mode tasks) live in an in-memory `Map`. Restarting the server clears sessions. v0.2 adds JSON-file persistence.
 - **No browser overlay / pixel cursor.** The "ghost cursor" is a *conceptual* highlight (file + fileHint), not screen coordinates. The v0.3 browser overlay will highlight DOM nodes, not pixels — far more reliable than screenshot grounding.
 - **No network calls, no API keys.** The server is local-first by design.

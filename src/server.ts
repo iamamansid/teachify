@@ -12,9 +12,11 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 import { getHint } from "./engine/hints.js";
+import { buildDynamicTask, validateTeachPlan } from "./engine/plan.js";
 import {
   advanceSession,
   createSession,
+  createSessionForTask,
   currentStep,
   getSession,
   getTaskForSession,
@@ -22,7 +24,8 @@ import {
   recordAttempt,
   toPublicStep,
 } from "./engine/session.js";
-import { getTask, listTaskSummaries, loadTasks } from "./engine/tasks.js";
+import { getTask, listTaskSummaries, loadTasks, registerDynamicTask } from "./engine/tasks.js";
+import { getTeachModePrompt, TEACH_MODE_EXAMPLE_PROMPT, TEACH_MODE_HOW_TO_USE, TEACH_MODE_RULES } from "./engine/teach-mode.js";
 import { verifyStep } from "./engine/verifier.js";
 
 const VERSION = "0.1.0";
@@ -315,6 +318,129 @@ export function createServer(): McpServer {
           : "Call teach_next_step to continue.",
       });
     }
+  );
+
+  // --- Teach Mode (any prompt) ---
+  // teach_mode_on: load the Teach Mode system prompt + rules.
+  server.tool(
+    "teach_mode_on",
+    "Turn on Teach Mode. Returns the Teach Mode system prompt + rules. After this, take the user's prompt as-is, break it into 3-7 steps, and call teach_plan — never write the user's code.",
+    {},
+    async () =>
+      text({
+        mode: "teach",
+        systemPrompt: getTeachModePrompt(),
+        rules: TEACH_MODE_RULES,
+        howToUse: TEACH_MODE_HOW_TO_USE,
+        examplePrompt: TEACH_MODE_EXAMPLE_PROMPT,
+        next: "Break the user's prompt into 3-7 verifiable steps and call teach_plan with {prompt, steps, quiz}. Guide one step at a time after that.",
+      })
+  );
+
+  // Shared teach_plan handler used by both teach_plan and teach_start_from_prompt.
+  const teachPlanShape = {
+    prompt: z.string().describe("The user's original prompt, as-is — e.g. 'Implement JWT auth'"),
+    title: z.string().optional().describe("Optional short title for the plan"),
+    steps: z
+      .array(
+        z
+          .object({
+            id: z.string().optional(),
+            title: z.string().optional(),
+            instruction: z.string().optional(),
+            why: z.string().optional(),
+            file: z.string().optional(),
+            fileHint: z.string().optional(),
+            whatToType: z.string().optional(),
+            check: z.any().optional(),
+            checkDescription: z.string().optional(),
+            hintL1: z.string().optional(),
+            hintL2: z.string().optional(),
+            hintL3: z.string().optional(),
+          })
+          .passthrough()
+      )
+      .describe("3-7 steps, one action / one file / one concept each, each with instruction, why, file, hints, check"),
+    quiz: z
+      .array(
+        z.object({
+          question: z.string().optional(),
+          options: z.array(z.string()).optional(),
+          answerIndex: z.number().optional(),
+          explanation: z.string().optional(),
+        })
+      )
+      .optional()
+      .describe("Optional 2-3 quiz questions. If omitted, Teachify supplies a default 2-question quiz."),
+    mode: z.enum(["teach", "hint", "do"]).optional().default("teach"),
+  };
+
+  async function handleTeachPlan(args: {
+    prompt?: string;
+    title?: string;
+    steps?: Array<Record<string, unknown>>;
+    quiz?: Array<Record<string, unknown>>;
+    mode?: "teach" | "hint" | "do";
+  }) {
+    const errors = validateTeachPlan({
+      prompt: args.prompt,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      steps: (args.steps ?? []) as any,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      quiz: args.quiz as any,
+      title: args.title,
+    });
+    if (errors.length > 0) {
+      return text({
+        error: "Teach plan rejected — fix the errors and call teach_plan again. No session was created.",
+        errors,
+        hint: "Steps must be 3-7, one action / one file / one concept each, each with non-empty title, instruction, why, file, hintL1, hintL2, hintL3, and a valid check. Quiz, if present, must be 2-3 questions.",
+      });
+    }
+    const task = buildDynamicTask({
+      prompt: args.prompt,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      steps: args.steps as any,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      quiz: args.quiz as any,
+      title: args.title,
+    });
+    registerDynamicTask(task);
+    const session = createSessionForTask(task, args.mode ?? "teach");
+    return text({
+      sessionId: session.id,
+      taskId: task.id,
+      mode: session.mode,
+      prompt: args.prompt,
+      task: {
+        id: task.id,
+        title: task.title,
+        description: task.description,
+        level: task.level,
+        estimatedMinutes: task.estimatedMinutes,
+        totalSteps: task.steps.length,
+        learningOutcomes: task.learningOutcomes,
+      },
+      currentStep: toPublicStep(task, 0),
+      rule: "The learner types every line. Teachify guides, verifies, hints, and quizzes — it never writes the solution. Step 1 only is returned here.",
+      next: "Call teach_check_step with { sessionId, file, content } after the learner completes this step.",
+    });
+  }
+
+  server.tool(
+    "teach_plan",
+    "Plan a Teach Mode session from ANY user prompt. Validates 3-7 steps (each with instruction, why, file, hints, check) and 2-3 quiz questions. On valid, creates a session and returns step 1 only — never the full solution. On invalid, returns clear errors and creates nothing.",
+    teachPlanShape,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async (args: any) => handleTeachPlan(args)
+  );
+
+  server.tool(
+    "teach_start_from_prompt",
+    "Alias of teach_plan for discoverability. Same schema, same behaviour: plan a Teach Mode session from ANY user prompt.",
+    teachPlanShape,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async (args: any) => handleTeachPlan(args)
   );
 
   // Convenience: list tasks without starting one (useful for clients).

@@ -11,3 +11,15 @@ for (const f of fs.readdirSync(src)) {
   fs.copyFileSync(path.join(src, f), path.join(dest, f));
   console.log(`copied task ${f} -> dist/tasks/`);
 }
+
+// Also copy the Teach Mode prompt from src/prompts/ to dist/prompts/.
+const promptsSrc = path.join(__dirname, "..", "src", "prompts");
+const promptsDest = path.join(__dirname, "..", "dist", "prompts");
+if (fs.existsSync(promptsSrc)) {
+  fs.mkdirSync(promptsDest, { recursive: true });
+  for (const f of fs.readdirSync(promptsSrc)) {
+    if (!f.endsWith(".md")) continue;
+    fs.copyFileSync(path.join(promptsSrc, f), path.join(promptsDest, f));
+    console.log(`copied prompt ${f} -> dist/prompts/`);
+  }
+}

@@ -59,6 +59,17 @@ function validateTask(raw: unknown, file: string): TeachTask {
 }
 
 let cache: TeachTask[] | null = null;
+const dynamicTasks = new Map<string, TeachTask>();
+
+/** Register a Teach Mode dynamic task (from teach_plan). */
+export function registerDynamicTask(task: TeachTask): void {
+  dynamicTasks.set(task.id, task);
+}
+
+/** Test-only: clear dynamic tasks. */
+export function _clearDynamicTasks(): void {
+  dynamicTasks.clear();
+}
 
 /** Load all task definitions. Results are cached per process. */
 export function loadTasks(): TeachTask[] {
@@ -75,11 +86,13 @@ export function loadTasks(): TeachTask[] {
 }
 
 export function getTask(taskId: string): TeachTask | undefined {
+  const dynamic = dynamicTasks.get(taskId);
+  if (dynamic) return dynamic;
   return loadTasks().find((t) => t.id === taskId);
 }
 
 export function listTaskSummaries() {
-  return loadTasks().map((t) => ({
+  const json = loadTasks().map((t) => ({
     id: t.id,
     title: t.title,
     description: t.description,
@@ -87,6 +100,15 @@ export function listTaskSummaries() {
     estimatedMinutes: t.estimatedMinutes,
     steps: t.steps.length,
   }));
+  const dynamic = [...dynamicTasks.values()].map((t) => ({
+    id: t.id,
+    title: t.title,
+    description: t.description,
+    level: t.level,
+    estimatedMinutes: t.estimatedMinutes,
+    steps: t.steps.length,
+  }));
+  return [...json, ...dynamic];
 }
 
 /** Test-only: clear the loader cache so tests can reload. */

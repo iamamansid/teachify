@@ -15,7 +15,7 @@ Goal: a **24–48h velocity burst**, not a slow drip. GitHub trending rewards st
 Post in this order, all within the same morning where possible:
 
 1. **Hacker News — Show HN** (8–9 AM ET is the classic window).
-   Title: `Show HN: Teachify — MCP connector that turns your LLM into a teacher, not a doer`
+   Title: `Show HN: Teachify — Teach Mode for any LLM (same prompt, guided instead of done)`
    Body: problem (autopilot deskilling) → demo GIF → install (3 commands) → "The AI guides. You type. You learn." → ask for feedback + task ideas.
    Stay online for 2h and reply to every comment.
 2. **Reddit** — r/programming, r/learnprogramming, r/ClaudeAI / r/cursor as relevant. Tailor the title per subreddit; lead with the problem, not marketing copy. Ask for task ideas.
@@ -26,10 +26,12 @@ Post in this order, all within the same morning where possible:
 ## Demo video script (20 sec)
 
 > 0–3s: "LLM agents write all your code. You learn nothing."
-> 3–8s: Screen: `Teach me js-express-hello` → AI shows Step 1/5.
+> 3–8s: Screen: `Teach Mode on. Implement rate limiting.` → AI breaks it into steps, shows Step 1/5.
 > 8–14s: Learner types the line. AI: "✅ Verified. Step 2/5…"
-> 14–18s: Learner finishes. AI quizzes: "What does app.get() actually do?" Learner answers.
+> 14–18s: Learner finishes. AI quizzes: "What does rate limiting actually protect?" Learner answers.
 > 18–20s: "Teachify. The AI guides. You type. You learn." + repo URL.
+
+Lead with Teach Mode on a **fresh prompt** (rate limiting), not just a canned task — that is the product. Show the canned tasks only as "or try a demo task instantly".
 
 Keep the video to **one task, one pass, no setup**. If setup takes >10s, pre-record the install.
 
