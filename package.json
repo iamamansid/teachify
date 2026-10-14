@@ -34,7 +34,7 @@
     "url": "https://github.com/iamamansid/teachify.git"
   },
   "scripts": {
-    "build": "NODE_OPTIONS=--max-old-space-size=4096 tsc && node scripts/copy-tasks.js",
+    "build": "node --max-old-space-size=4096 node_modules/typescript/bin/tsc && node scripts/copy-tasks.js",
     "dev": "tsx src/server.ts",
     "inspect": "npx @modelcontextprotocol/inspector node dist/server.js",
     "lint": "tsc --noEmit",
