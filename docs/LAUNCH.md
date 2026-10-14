@@ -16,7 +16,7 @@ Post in this order, all within the same morning where possible:
 
 1. **Hacker News — Show HN** (8–9 AM ET is the classic window).
    Title: `Show HN: Teachify — MCP connector that turns your LLM into a teacher, not a doer`
-   Body: problem (autopilot deskilling) → demo GIF → install (3 commands) → "Graphify maps code FOR agents. Teachify teaches humans WITH agents." → ask for feedback + task ideas.
+   Body: problem (autopilot deskilling) → demo GIF → install (3 commands) → "The AI guides. You type. You learn." → ask for feedback + task ideas.
    Stay online for 2h and reply to every comment.
 2. **Reddit** — r/programming, r/learnprogramming, r/ClaudeAI / r/cursor as relevant. Tailor the title per subreddit; lead with the problem, not marketing copy. Ask for task ideas.
 3. **X** — thread: problem → 20-sec video → install → tools list → "you type, AI guides". Tag no one unless genuinely relevant.
@@ -29,7 +29,7 @@ Post in this order, all within the same morning where possible:
 > 3–8s: Screen: `Teach me js-express-hello` → AI shows Step 1/5.
 > 8–14s: Learner types the line. AI: "✅ Verified. Step 2/5…"
 > 14–18s: Learner finishes. AI quizzes: "What does app.get() actually do?" Learner answers.
-> 18–20s: "Teachify. Graphify maps code FOR agents. Teachify teaches humans WITH agents." + repo URL.
+> 18–20s: "Teachify. The AI guides. You type. You learn." + repo URL.
 
 Keep the video to **one task, one pass, no setup**. If setup takes >10s, pre-record the install.
 

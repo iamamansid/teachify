@@ -1,6 +1,6 @@
 # Teachify — Learn by Doing
 
-> **Graphify maps code FOR agents. Teachify teaches humans WITH agents.**
+> **The AI guides. You type. You learn.**
 
 Every LLM agent today is an autopilot: it writes the code, you watch, you learn nothing. Junior engineers are shipping code they can't explain or debug — and the research backs it: AI-assisted juniors scored lower on follow-up comprehension and debugging tests than peers who coded unaided.
 
@@ -26,17 +26,19 @@ You:  [answers — and can explain it]
 
 Watch the full 20-sec video: *(add demo GIF / YouTube link on launch day)*
 
-## Graphify vs Teachify
+## How Teachify is different
 
-|  | Graphify | Teachify |
+Most AI coding help is autopilot: it writes the code, you watch, and you keep none of the skill. Teachify is built on the opposite principle — **guided doing**:
+
+|  | Autopilot help | Teachify |
 |---|---|---|
-| For whom | AI agents | Humans learning with AI |
-| What it does | Maps a codebase into a queryable knowledge graph | Turns a task into guided, verified, bite-size steps |
-| Who writes the code | The agent | **You** |
-| What you keep | A faster agent | The skill |
-| Core verbs | `query_graph`, `get_neighbors` | `teach_start_task`, `teach_check_step`, `teach_hint`, `teach_quiz` |
+| Who writes the code | The AI | **You** |
+| Step size | Whole solution at once | One verified step at a time |
+| When you're stuck | It gives the answer | It gives an escalating hint — you still type it |
+| What you keep after | A finished task | The skill + the finished task |
+| How it checks learning | Nothing | Step verification + end-of-task quiz |
 
-They're complements, not competitors. Graphify helps the agent understand code. Teachify helps *you* understand code.
+The core verbs are `teach_start_task`, `teach_check_step`, `teach_hint`, `teach_quiz` — tools for teaching, not for doing the work for you.
 
 ## Install
 
