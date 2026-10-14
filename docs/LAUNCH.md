@@ -38,11 +38,11 @@ Keep the video to **one task, one pass, no setup**. If setup takes >10s, pre-rec
 ## What to measure (first week)
 
 - Stars, forks, clones (GitHub Insights), issues, PRs (especially new-task PRs).
-- Honest user quotes: "I finally understood @RestController" — screenshot + save to `docs/GTV-EVIDENCE.md` tracker.
+- Honest user quotes: "I finally understood @RestController" — screenshot and save them; testimonials are the best marketing.
 - Drop-off: where do learners stall? (Step with most hints / attempts.)
 
 ## What NOT to do
 
-- Don't buy stars / fake engagement. Assessors, maintainers, and HN all spot it, and it poisons GTV evidence.
+- Don't buy stars / fake engagement. Maintainers and HN spot it instantly, and it poisons trust.
 - Don't launch without the demo video. A wall of text doesn't spread.
 - Don't promise the browser overlay / pixel cursor in v0.1. Ship what exists.

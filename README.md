@@ -173,10 +173,6 @@ Add a new task: drop a JSON file in `src/tasks/` following the schema in `docs/A
 
 See `CONTRIBUTING.md` (coming with first release) — TL;DR: new tasks are the best first PR. One JSON file + tests. No solution-dumping: every step must be verifiable and every hint must preserve the learner typing the code.
 
-## Global Talent Visa note
-
-Teachify is built as a **real tool for real learners**, not as a stars-chasing exercise. If you use it as GTV evidence, read `docs/GTV-EVIDENCE.md`: Tech Nation wants 1 mandatory + 2 optional criteria + 3 letters, judged holistically. Stars help, but forks, PRs, downloads, testimonials, talks, and media matter as much — and evidence that looks created solely for the application is penalised. Build the evidence by building the users.
-
 ## License
 
 MIT — see `LICENSE`.
