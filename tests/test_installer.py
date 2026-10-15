@@ -86,7 +86,7 @@ def test_install_local_writes_project_configs(fake_home, workdir):
 
 def test_install_client_filter(fake_home, workdir):
     results = installer.install(clients=["codex"])
-    assert list(results) == ["codex", "/teach slash command"]
+    assert list(results) == ["codex", "codex skill ($teachify)", "/teach slash command"]
     assert not (fake_home / ".claude.json").exists()
 
 
@@ -116,3 +116,21 @@ def test_uninstall_preserves_other_servers(fake_home, workdir):
     installer.install()
     installer.uninstall()
     assert codex_toml.read_text(encoding="utf-8") == '[mcp_servers.other]\ncommand = "other-cmd"\n'
+
+
+def test_install_codex_skill(fake_home, workdir):
+    results = installer.install(clients=["codex"])
+    assert results["codex skill ($teachify)"] == "added"
+    skill = fake_home / ".codex" / "skills" / "teachify" / "SKILL.md"
+    assert skill.exists()
+    text = skill.read_text(encoding="utf-8")
+    assert "name: teachify" in text
+    assert "$teachify" in text
+    # idempotent
+    assert installer.install(clients=["codex"])["codex skill ($teachify)"] == "unchanged"
+
+
+def test_uninstall_removes_codex_skill(fake_home, workdir):
+    installer.install(clients=["codex"])
+    assert installer.uninstall()["codex skill ($teachify)"] == "removed"
+    assert not (fake_home / ".codex" / "skills" / "teachify" / "SKILL.md").exists()

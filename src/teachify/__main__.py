@@ -59,7 +59,12 @@ def main() -> None:
             local=args.local, clients=args.clients, config=args.config, config_key=args.key
         ).items():
             print(f"  {label}: {status}")
-        print("\nDone — restart your agent client, then type: /teach <what you want to learn>")
+        print(
+            "\nDone — restart your agent client, then start Teach Mode:\n"
+            "  Claude Code:  /teach <what you want to learn>\n"
+            "  Codex:       $teachify <task>  (or just say \"teach me <X>\")\n"
+            "  Others:      ask your agent to \"teach me <X> using Teachify\""
+        )
         return
 
     if args.command == "uninstall":

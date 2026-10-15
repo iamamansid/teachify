@@ -132,6 +132,36 @@ def _install_slash_command() -> str:
     return "added"
 
 
+# ---------------------------------------------------------------- skills
+
+def _install_codex_skill() -> str:
+    """Install the Teachify skill for Codex (~/.codex/skills/teachify/SKILL.md).
+
+    Codex has no custom slash commands, so this is the Codex-native way to get
+    `$teachify` / auto-trigger on "teach me". Idempotent.
+    """
+    src = resources.files("teachify") / "skills" / "teachify" / "SKILL.md"
+    text = src.read_text(encoding="utf-8")
+    target = Path.home() / ".codex" / "skills" / "teachify" / "SKILL.md"
+    if target.exists() and target.read_text(encoding="utf-8") == text:
+        return "unchanged"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(text, encoding="utf-8")
+    return "added"
+
+
+def _remove_codex_skill() -> str:
+    target = Path.home() / ".codex" / "skills" / "teachify" / "SKILL.md"
+    if target.exists():
+        target.unlink()
+        try:
+            target.parent.rmdir()  # remove dir if now empty
+        except OSError:
+            pass
+        return "removed"
+    return "unchanged"
+
+
 # ---------------------------------------------------------------- public API
 
 def _client_entry(client: str) -> dict:
@@ -176,6 +206,7 @@ def install(
         )
     if "codex" in want:
         results["codex"] = _upsert_codex_toml(Path.home() / ".codex" / "config.toml")
+        results["codex skill ($teachify)"] = _install_codex_skill()
     if "vscode" in want:
         # VS Code reads workspace config; its key is "servers", not "mcpServers".
         results["vscode (this project)"] = _upsert_json(
@@ -200,6 +231,7 @@ def uninstall() -> dict[str, str]:
             Path.home() / ".copilot" / "mcp-config.json", "mcpServers"
         ),
         "codex": _remove_codex_toml(Path.home() / ".codex" / "config.toml"),
+        "codex skill ($teachify)": _remove_codex_skill(),
         "vscode (this project)": _remove_json(Path.cwd() / ".vscode" / "mcp.json", "servers"),
     }
     target = Path.home() / ".claude" / "commands" / "teach.md"

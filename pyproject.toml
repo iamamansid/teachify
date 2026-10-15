@@ -35,7 +35,7 @@ Repository = "https://github.com/iamamansid/teachify"
 where = ["src"]
 
 [tool.setuptools.package-data]
-teachify = ["prompts/*.md", "tasks/*.json", "commands/*.md"]
+teachify = ["prompts/*.md", "tasks/*.json", "commands/*.md", "skills/teachify/SKILL.md"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

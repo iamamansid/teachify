@@ -95,10 +95,10 @@ That registers Teachify as an MCP server in every client it finds and installs t
 
 | Client | What `teachify install` writes |
 |---|---|
-| Claude Code | `~/.claude.json` (`mcpServers`) + `~/.claude/commands/teach.md` |
+| Claude Code | `~/.claude.json` (`mcpServers`) + `~/.claude/commands/teach.md` → then `/teach <what you want to learn>` |
 | Cursor | `~/.cursor/mcp.json` |
 | GitHub Copilot CLI | `~/.copilot/mcp-config.json` |
-| Codex | `~/.codex/config.toml` (`[mcp_servers.teachify]`) |
+| Codex | `~/.codex/config.toml` (`[mcp_servers.teachify]`) + skill at `~/.codex/skills/teachify/SKILL.md` → then `$teachify <task>` (Codex has no custom `/` commands, so the skill is the native trigger — or just say "teach me <X>") |
 | VS Code | `./.vscode/mcp.json` (workspace) |
 
 Options: `--client claude` (repeatable, pick specific clients), `--local` (write `./.mcp.json` / `./.vscode/mcp.json` for this project instead of global config), `--config PATH --key mcpServers` (any other agent's JSON config — the escape hatch). `teachify uninstall` removes it all again. Everything is idempotent and never touches your other servers.
