@@ -4,7 +4,7 @@
 
 Every LLM agent today is an autopilot: it writes the code, you watch, you learn nothing. Junior engineers are shipping code they can't explain or debug — and the research backs it: AI-assisted juniors scored lower on follow-up comprehension and debugging tests than peers who coded unaided.
 
-Teachify flips the default. It's an **MCP connector** that turns any LLM (Claude Code, Cursor, Codex, VS Code) into a **teacher, not a doer**:
+Teachify flips the default. It's a **pip-installable MCP connector** that turns any LLM (Claude Code, Cursor, Codex, VS Code) into a **teacher, not a doer**:
 
 - The AI **guides** — step by step, with the *why* behind each step.
 - **You type every line.** The AI never writes your code.
@@ -31,7 +31,7 @@ You:  [answer — and can explain it]
 
 ### How it works
 
-1. **Turn Teach Mode on** — call `teach_mode_on` to load the Teach Mode system prompt (`src/prompts/teach-mode.md`).
+1. **Turn Teach Mode on** — call `teach_mode_on` to load the Teach Mode system prompt (or just run `/teach` in Claude Code).
 2. **Plan from any prompt** — the LLM breaks your prompt into 3–7 verifiable steps and calls `teach_plan` with `{ prompt, steps, quiz }` (alias: `teach_start_from_prompt`). Teachify validates the plan (3–7 steps, every step has instruction / why / file / hints / check, quiz 2–3 questions) and creates a session. Invalid plans are rejected with errors naming the failing step/field — no session is created.
 3. **Guide / verify / quiz** — one step at a time with `teach_next_step` → you type → `teach_check_step` → `teach_hint` (L1–L3) if stuck → `teach_quiz` at the end.
 
@@ -39,7 +39,7 @@ The planning lives in the LLM (it has your context). The enforcement lives in Te
 
 ### Try it instantly (no planning needed)
 
-The two demo tasks below are pre-authored plans — same Teach Mode loop, zero planning. Start with one of these to feel the loop, then use Teach Mode on your own prompt.
+The two demo tasks below are pre-authored plans — same Teach Mode loop, zero planning. Start with one of these to feel the loop, then use Teach Mode on your own prompt. Or just run `/teach-task js-express-hello` in Claude Code.
 
 ## 20-second demo
 
@@ -69,20 +69,56 @@ Most AI coding help is autopilot: it writes the code, you watch, and you keep no
 | What you keep after | A finished task | The skill + the finished task |
 | How it checks learning | Nothing | Step verification + end-of-task quiz |
 
-The core verbs are `teach_start_task`, `teach_check_step`, `teach_hint`, `teach_quiz` — tools for teaching, not for doing the work for you.
+The core verbs are `teach_mode_on`, `teach_plan`, `teach_check_step`, `teach_hint`, `teach_quiz` — tools for teaching, not for doing the work for you.
 
 ## Install
 
-**Prerequisites:** Node 20+.
+**Prerequisites:** Python 3.10+.
 
 ```bash
-git clone https://github.com/iamamansid/teachify.git
-cd teachify
-npm install
-npm run build
+pip install teachify
 ```
 
-### Claude Code
+Or isolated (recommended):
+
+```bash
+uv tool install teachify
+```
+
+Then connect it to your agents — no manual config editing:
+
+```bash
+teachify install
+```
+
+That registers Teachify as an MCP server in every client it finds and installs the `/teach` slash command for Claude Code:
+
+| Client | What `teachify install` writes |
+|---|---|
+| Claude Code | `~/.claude.json` (`mcpServers`) + `~/.claude/commands/teach.md` |
+| Cursor | `~/.cursor/mcp.json` |
+| GitHub Copilot CLI | `~/.copilot/mcp-config.json` |
+| Codex | `~/.codex/config.toml` (`[mcp_servers.teachify]`) |
+| VS Code | `./.vscode/mcp.json` (workspace) |
+
+Options: `--client claude` (repeatable, pick specific clients), `--local` (write `./.mcp.json` / `./.vscode/mcp.json` for this project instead of global config), `--config PATH --key mcpServers` (any other agent's JSON config — the escape hatch). `teachify uninstall` removes it all again. Everything is idempotent and never touches your other servers.
+
+Then in any connected agent:
+
+```
+> /teach Implement JWT auth in Express
+```
+
+Verify the install any time with:
+
+```bash
+teachify --version
+```
+
+### Manual setup (if you prefer)
+
+<details>
+<summary>Claude Code</summary>
 
 Add to your project's `.mcp.json` (or `~/.claude.json`):
 
@@ -90,37 +126,30 @@ Add to your project's `.mcp.json` (or `~/.claude.json`):
 {
   "mcpServers": {
     "teachify": {
-      "command": "node",
-      "args": ["/absolute/path/to/teachify/dist/server.js"]
+      "command": "teachify"
     }
   }
 }
 ```
+</details>
 
-Then in Claude Code:
+<details>
+<summary>Cursor / Copilot CLI / Codex / VS Code / any MCP client</summary>
 
-```
-> Teach me js-express-hello in Teach Mode.
-```
+Point your MCP client at the Teachify command:
 
-### Cursor / Codex / any MCP client
-
-Point your MCP client at the same command:
-
-- Command: `node`
-- Args: `["/absolute/path/to/teachify/dist/server.js"]`
+- Command: `teachify`
 - Transport: stdio
 
-### VS Code (thin client)
+If `teachify` isn't on your PATH (e.g. installed with `pipx`/`uv tool`), use the full path — find it with `which teachify`.
+</details>
 
-The `vscode-extension/` folder is a thin client that lists tasks and shows the current step in a sidebar. It spawns the MCP server — all teaching logic stays in the server.
+### Slash commands
 
-```bash
-cd vscode-extension
-npm install
-npm run build
-# then F5 in VS Code to run the extension host
-```
+- `/teach <your prompt>` — Teach Mode on any prompt. Same prompt you'd give an agent, guided step-by-step instead. (Installed globally by `teachify install`; project copies live in `.claude/commands/`.)
+- `/teach-task <task-id>` — start a pre-authored demo task (`js-express-hello`, `java-spring-hello`).
+
+There is also a `SKILL.md` at the repo root following the open agent-skill format, for agents that load skills directly.
 
 ## Tools
 
@@ -154,24 +183,24 @@ AI (teach_check_step): ✅ Verified…
 AI (teach_quiz): Q1: What does @RestController do? …
 ```
 
-## Tasks (v0.1) — demo library, not the product
+## Tasks (v0.2) — demo library, not the product
 
 The 2 pre-authored tasks are the demo library. **Teach Mode for any prompt is the product** (see top of this README).
 
 - `js-express-hello` — Build GET /hello with Express, 5 steps, beginner
 - `java-spring-hello` — Build GET /hello with Spring Boot `@RestController`, 5 steps, beginner
 
-Add a new task: drop a JSON file in `src/tasks/` following the schema in `docs/ARCHITECTURE.md`, then `npm run build`. No server code changes needed.
+Add a new task: drop a JSON file in `src/teachify/tasks/` following the schema in `docs/ARCHITECTURE.md`, then reinstall (`pip install -e .`). No server code changes needed.
 
 ## Roadmap
 
-- **v0.2** — Planner quality + persistence: better step-sizing for big prompts, JSON-file session persistence, more demo tasks (React, SQL, Docker, DSA).
-- **v0.3** — Browser overlay (highlight via DOM, not pixels) for web tasks (AWS console, GitHub, etc.).
+- **v0.3** — Planner quality + persistence: better step-sizing for big prompts, JSON-file session persistence, more demo tasks (React, SQL, Docker, DSA).
+- **v0.4** — Browser overlay (highlight via DOM, not pixels) for web tasks (AWS console, GitHub, etc.).
 - **v1.0** — Community task library + task sharing, mastery tracking, classroom mode.
 
 ## Contributing
 
-See `CONTRIBUTING.md` (coming with first release) — TL;DR: new tasks are the best first PR. One JSON file + tests. No solution-dumping: every step must be verifiable and every hint must preserve the learner typing the code.
+See `CONTRIBUTING.md` — TL;DR: new tasks are the best first PR. One JSON file + tests. No solution-dumping: every step must be verifiable and every hint must preserve the learner typing the code.
 
 ## License
 

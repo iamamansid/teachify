@@ -1,1 +1,226 @@
-{"description": "Teachify MCP tool specs for registries / clients.", "name": "teachify", "tools": [{"name": "teach_mode_on", "description": "Turn on Teach Mode. Returns the Teach Mode system prompt + rules.", "inputSchema": {"type": "object", "properties": {}}}, {"name": "teach_plan", "description": "Plan a Teach Mode session from ANY user prompt. Validates 3-7 steps + quiz. Returns step 1 only.", "inputSchema": {"type": "object", "properties": {"prompt": {"type": "string"}, "title": {"type": "string"}, "steps": {"type": "array", "description": "3-7 steps, each with title, instruction, why, file, hints, check"}, "quiz": {"type": "array", "description": "Optional 2-3 quiz questions"}, "mode": {"type": "string", "enum": ["teach", "hint", "do"], "default": "teach"}}, "required": ["prompt", "steps"]}}, {"name": "teach_start_from_prompt", "description": "Alias of teach_plan. Same schema, same behaviour.", "inputSchema": {"type": "object", "properties": {"prompt": {"type": "string"}, "title": {"type": "string"}, "steps": {"type": "array", "description": "3-7 steps, each with title, instruction, why, file, hints, check"}, "quiz": {"type": "array", "description": "Optional 2-3 quiz questions"}, "mode": {"type": "string", "enum": ["teach", "hint", "do"], "default": "teach"}}, "required": ["prompt", "steps"]}}, {"description": "Start a guided learning task. Returns overview + step 1 only \u2014 never the full solution.", "inputSchema": {"properties": {"mode": {"default": "teach", "enum": ["teach", "hint", "do"], "type": "string"}, "taskId": {"type": "string"}}, "required": ["taskId"], "type": "object"}, "name": "teach_start_task"}, {"description": "Return the current step. Never skips ahead.", "inputSchema": {"properties": {"sessionId": {"type": "string"}}, "required": ["sessionId"], "type": "object"}, "name": "teach_next_step"}, {"description": "Verify the learner's current step. Pass/fail + targeted feedback. On fail, never reveals next solution.", "inputSchema": {"properties": {"content": {"type": "string"}, "file": {"type": "string"}, "sessionId": {"type": "string"}}, "required": ["sessionId"], "type": "object"}, "name": "teach_check_step"}, {"description": "Escalating hints L1-L3. L3 still does not type the code.", "inputSchema": {"properties": {"level": {"enum": [1, 2, 3], "type": "number"}, "sessionId": {"type": "string"}}, "required": ["sessionId"], "type": "object"}, "name": "teach_hint"}, {"description": "2-3 quiz questions. answerIndex is for LLM grading only \u2014 do not reveal upfront.", "inputSchema": {"properties": {"sessionId": {"type": "string"}}, "required": ["sessionId"], "type": "object"}, "name": "teach_quiz"}, {"description": "Short explanation + analogy + try-it-yourself prompt.", "inputSchema": {"properties": {"concept": {"type": "string"}, "context": {"type": "string"}}, "required": ["concept"], "type": "object"}, "name": "teach_explain"}, {"description": "Progress summary: steps done, time, attempts, hints, mastery notes.", "inputSchema": {"properties": {"sessionId": {"type": "string"}}, "required": ["sessionId"], "type": "object"}, "name": "teach_progress"}, {"description": "List available learning tasks.", "inputSchema": {"properties": {}, "type": "object"}, "name": "teach_list_tasks"}], "version": "0.1.0"}
+{
+  "description": "Teachify MCP tool specs for registries / clients.",
+  "name": "teachify",
+  "tools": [
+    {
+      "name": "teach_mode_on",
+      "description": "Turn on Teach Mode. Returns the Teach Mode system prompt + rules.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "name": "teach_plan",
+      "description": "Plan a Teach Mode session from ANY user prompt. Validates 3-7 steps + quiz. Returns step 1 only.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "prompt": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "steps": {
+            "type": "array",
+            "description": "3-7 steps, each with title, instruction, why, file, hints, check"
+          },
+          "quiz": {
+            "type": "array",
+            "description": "Optional 2-3 quiz questions"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "teach",
+              "hint",
+              "do"
+            ],
+            "default": "teach"
+          }
+        },
+        "required": [
+          "prompt",
+          "steps"
+        ]
+      }
+    },
+    {
+      "name": "teach_start_from_prompt",
+      "description": "Alias of teach_plan. Same schema, same behaviour.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "prompt": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "steps": {
+            "type": "array",
+            "description": "3-7 steps, each with title, instruction, why, file, hints, check"
+          },
+          "quiz": {
+            "type": "array",
+            "description": "Optional 2-3 quiz questions"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "teach",
+              "hint",
+              "do"
+            ],
+            "default": "teach"
+          }
+        },
+        "required": [
+          "prompt",
+          "steps"
+        ]
+      }
+    },
+    {
+      "description": "Start a guided learning task. Returns overview + step 1 only — never the full solution.",
+      "inputSchema": {
+        "properties": {
+          "mode": {
+            "default": "teach",
+            "enum": [
+              "teach",
+              "hint",
+              "do"
+            ],
+            "type": "string"
+          },
+          "taskId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "taskId"
+        ],
+        "type": "object"
+      },
+      "name": "teach_start_task"
+    },
+    {
+      "description": "Return the current step. Never skips ahead.",
+      "inputSchema": {
+        "properties": {
+          "sessionId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "sessionId"
+        ],
+        "type": "object"
+      },
+      "name": "teach_next_step"
+    },
+    {
+      "description": "Verify the learner's current step. Pass/fail + targeted feedback. On fail, never reveals next solution.",
+      "inputSchema": {
+        "properties": {
+          "content": {
+            "type": "string"
+          },
+          "file": {
+            "type": "string"
+          },
+          "sessionId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "sessionId"
+        ],
+        "type": "object"
+      },
+      "name": "teach_check_step"
+    },
+    {
+      "description": "Escalating hints L1-L3. L3 still does not type the code.",
+      "inputSchema": {
+        "properties": {
+          "level": {
+            "enum": [
+              1,
+              2,
+              3
+            ],
+            "type": "number"
+          },
+          "sessionId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "sessionId"
+        ],
+        "type": "object"
+      },
+      "name": "teach_hint"
+    },
+    {
+      "description": "2-3 quiz questions. answerIndex is for LLM grading only — do not reveal upfront.",
+      "inputSchema": {
+        "properties": {
+          "sessionId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "sessionId"
+        ],
+        "type": "object"
+      },
+      "name": "teach_quiz"
+    },
+    {
+      "description": "Short explanation + analogy + try-it-yourself prompt.",
+      "inputSchema": {
+        "properties": {
+          "concept": {
+            "type": "string"
+          },
+          "context": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "concept"
+        ],
+        "type": "object"
+      },
+      "name": "teach_explain"
+    },
+    {
+      "description": "Progress summary: steps done, time, attempts, hints, mastery notes.",
+      "inputSchema": {
+        "properties": {
+          "sessionId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "sessionId"
+        ],
+        "type": "object"
+      },
+      "name": "teach_progress"
+    },
+    {
+      "description": "List available learning tasks.",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "teach_list_tasks"
+    }
+  ],
+  "version": "0.3.0"
+}

@@ -27,7 +27,7 @@ Do **not** use Teach Mode when the user explicitly wants the work done for them 
 
 ```
 teach_mode_on
-  → loads src/prompts/teach-mode.md (rules + examples)
+  → loads teachify/prompts/teach-mode.md (rules + examples)
 teach_plan { prompt, steps, quiz }   (alias: teach_start_from_prompt)
   → Teachify validates → dynamic task teach-<id> + session → step 1 only
 teach_next_step → learner types → teach_check_step
@@ -79,11 +79,11 @@ teach_quiz → teach_progress
 | Plan invalid (missing hint, bad check, <3 steps) | `teach_plan` rejects, naming step/field | Fix the named field, call `teach_plan` again. No session is created on rejection |
 | Learner fails a check | `teach_check_step` returns pass:false + feedback | Feedback → hint → retry. Session does not advance |
 | LLM tries to dump the full solution | Teachify returns step 1 only; `teach_check_step` preview is title-only | Do not paste remaining steps in chat. Guide one step at a time |
-| Session lost (server restart) | In-memory sessions cleared (v0.1) | Re-plan with `teach_plan`. Persistence lands in v0.2 |
+| Session lost (server restart) | In-memory sessions cleared (v0.2) | Re-plan with `teach_plan`. Persistence lands in v0.3 |
 
 ## Validation (what Teachify enforces)
 
-`teach_plan` validation (`src/engine/plan.ts`):
+`teach_plan` validation (`src/teachify/engine/plan.py`):
 
 - `prompt` non-empty.
 - `steps` is an array of 3–7.
@@ -94,4 +94,4 @@ Invalid → `{ error, errors: [...] }`, no session created. Valid → dynamic ta
 
 ## System prompt
 
-The canonical Teach Mode system prompt is `src/prompts/teach-mode.md`, loaded by `teach_mode_on`. It contains the full rules, the vague/too-big handling, and two title-only examples (JWT auth → 5 steps, pagination → 4 steps). The loader falls back to an embedded rules summary if the file is missing, so `teach_mode_on` never fails.
+The canonical Teach Mode system prompt is `teachify/prompts/teach-mode.md` (shipped as package data), loaded by `teach_mode_on`. It contains the full rules, the vague/too-big handling, and two title-only examples (JWT auth → 5 steps, pagination → 4 steps). The loader falls back to an embedded rules summary if the file is missing, so `teach_mode_on` never fails.

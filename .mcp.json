@@ -1,1 +1,3 @@
-{"mcpServers":{"teachify":{"args":["/absolute/path/to/teachify/dist/server.js"],"command":"node","env":{}}}}
+{
+  "mcpServers": {}
+}

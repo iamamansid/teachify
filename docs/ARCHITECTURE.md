@@ -1,4 +1,4 @@
-# Architecture — Teachify v0.1
+# Architecture — Teachify v0.2 (Python)
 
 ## Teach Mode flow (any prompt) — the product
 
@@ -38,16 +38,22 @@ Teachify is an **MCP server over stdio**, not a VS Code-only extension and not a
 ```
 ┌─────────────┐     MCP / stdio (JSON-RPC)     ┌──────────────────┐
 │  LLM client │ ◄────────────────────────────► │ Teachify server  │
-│ Claude Code │  tools/call: teach_*            │  src/server.ts   │
-│ Cursor      │                                 │                  │
-│ VS Code     │                                 │  engine/         │
-└─────────────┘                                 │   tasks.ts       │
-                                                │   session.ts     │
-                                                │   verifier.ts    │
-                                                │   hints.ts       │
+│ Claude Code │  tools/call: teach_*            │  src/teachify/   │
+│ Cursor      │                                 │  server.py       │
+│ VS Code     │  (FastMCP, `teachify` command)  │  (FastMCP)       │
+└─────────────┘                                 │  engine/         │
+                                                │   tasks.py       │
+                                                │   session.py     │
+                                                │   verifier.py    │
+                                                │   hints.py       │
+                                                │   plan.py        │
                                                 │  tasks/*.json    │
                                                 └──────────────────┘
 ```
+
+The canonical distribution is the Python package (`pip install teachify`,
+`src/teachify/`). The original TypeScript/Node implementation is preserved in
+`archive/typescript-v0/` for reference — behavior was ported 1:1.
 
 ## Session flow
 
@@ -81,7 +87,7 @@ Key invariants:
 
 ## Task JSON schema
 
-File: `src/tasks/<task-id>.json`. Validated on load by `engine/tasks.ts`.
+File: `src/teachify/tasks/<task-id>.json`. Validated on load by `engine/tasks.py`.
 
 ```jsonc
 {
@@ -131,14 +137,14 @@ Regex tips: use `flags: "ms"` when the pattern spans lines. Keep patterns forgiv
 
 ## How to add a new task
 
-1. Copy `src/tasks/js-express-hello.json` to `src/tasks/<your-task>.json`.
+1. Copy `src/teachify/tasks/js-express-hello.json` to `src/teachify/tasks/<your-task>.json`.
 2. Fill in 3–7 steps. Each step: one action, one `why`, one check, three hints.
 3. Write 2–3 quiz questions that test *understanding*, not recall of the exact code.
-4. Run `npm run build && npm test`. The loader validates the schema; the verifier tests prove pass/fail behaviour.
-5. Add the task id to `README.md` tasks list and to the VS Code quick-pick (optional).
+4. Run `pytest`. The loader validates the schema; the verifier tests prove pass/fail behaviour.
+5. Add the task id to `README.md` tasks list and to the `/teach-task` slash command examples (optional).
 
-## What is deliberately NOT in v0.1
+## What is deliberately NOT in v0.2
 
-- **No persistence.** Sessions (including dynamic Teach Mode tasks) live in an in-memory `Map`. Restarting the server clears sessions. v0.2 adds JSON-file persistence.
+- **No persistence.** Sessions (including dynamic Teach Mode tasks) live in-memory. Restarting the server clears sessions. v0.3 adds JSON-file persistence.
 - **No browser overlay / pixel cursor.** The "ghost cursor" is a *conceptual* highlight (file + fileHint), not screen coordinates. The v0.3 browser overlay will highlight DOM nodes, not pixels — far more reliable than screenshot grounding.
 - **No network calls, no API keys.** The server is local-first by design.
