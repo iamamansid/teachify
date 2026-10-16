@@ -3,6 +3,7 @@ README.md
 pyproject.toml
 src/teachify/__init__.py
 src/teachify/__main__.py
+src/teachify/installer.py
 src/teachify/server.py
 src/teachify.egg-info/PKG-INFO
 src/teachify.egg-info/SOURCES.txt
@@ -10,6 +11,7 @@ src/teachify.egg-info/dependency_links.txt
 src/teachify.egg-info/entry_points.txt
 src/teachify.egg-info/requires.txt
 src/teachify.egg-info/top_level.txt
+src/teachify/commands/teach.md
 src/teachify/engine/__init__.py
 src/teachify/engine/hints.py
 src/teachify/engine/plan.py
@@ -19,8 +21,10 @@ src/teachify/engine/teach_mode.py
 src/teachify/engine/types.py
 src/teachify/engine/verifier.py
 src/teachify/prompts/teach-mode.md
+src/teachify/skills/teachify/SKILL.md
 src/teachify/tasks/java-spring-hello.json
 src/teachify/tasks/js-express-hello.json
+tests/test_installer.py
 tests/test_plan.py
 tests/test_session.py
 tests/test_verifier.py
