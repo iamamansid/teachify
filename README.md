@@ -55,7 +55,9 @@ AI:   🎉 All steps verified. Quiz: What does app.get() actually do?
 You:  [answers — and can explain it]
 ```
 
-Watch the full 20-sec video: *(add demo GIF / YouTube link on launch day)*
+## Watch it in action (63 seconds)
+
+![Teachify demo — a /teach prompt becomes a guided lesson; you type every line](docs/demo.mp4)
 
 ## How Teachify is different
 
